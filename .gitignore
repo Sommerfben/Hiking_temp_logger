@@ -1,0 +1,7 @@
+build
+lib/temperature/temp_shtc3.h.unc-backup.md5~
+lib/temperature/temp_shtc3.h.unc-backup~
+*.unc-backup~
+*.unc-backup.md5~
+.vscode/
+lib/LCD
