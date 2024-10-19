@@ -29,7 +29,7 @@ int main()
    stdio_init_all();
 
    // Initialise the Wi-Fi chip
-   if (cyw43_arch_init())
+    if (cyw43_arch_init())
    {
       printf("Wi-Fi init failed\n");
       return(-1);
@@ -127,11 +127,52 @@ int main()
 
    printf("Hello, world!\n");
    float temp_data[2];
-   temp_sensor.make_low_power_measurement_blocking(temp_data);
-   printf("Temperature: %f\n", temp_data[0]);
-   printf("Humidity: %f\n", temp_data[1]);
 
-   while (true)
-   {
-   }
+    uint16_t num_samples = 1000;
+
+   float lowPowerTemperatureMeasurements[num_samples];
+   float highPowerTemperatureMeasurements[num_samples];
+   float lowPowerHumidityMeasurements[num_samples];
+   float highPowerHumidityMeasurements[num_samples];
+
+   for (int i = 0; i < num_samples; i++)
+    {
+        temp_sensor.make_low_power_measurement_blocking(temp_data);
+        lowPowerTemperatureMeasurements[i] = temp_data[0];
+        lowPowerHumidityMeasurements[i] = temp_data[1];
+        sleep_ms(10);
+        temp_sensor.make_high_power_measurement_blocking(temp_data);
+        highPowerTemperatureMeasurements[i] = temp_data[0];
+        highPowerHumidityMeasurements[i] = temp_data[1];
+        sleep_ms(10);
+    }
+    
+    printf("\n\nLow Power Temperature Measurements\n");
+    printf("----------------------------------\n");
+    for (int i = 0; i < num_samples; i++)
+    {
+        printf("%f,", lowPowerTemperatureMeasurements[i]);
+    }
+    
+    printf("\n\nHigh Power Temperature Measurements\n");
+    printf("-----------------------------------\n");
+    for (int i = 0; i < num_samples; i++)
+    {
+        printf("%f,", highPowerTemperatureMeasurements[i]);
+    }
+
+    printf("\n\nLow Power Humidity Measurements\n");
+    printf("----------------------------------\n");
+    for (int i = 0; i < num_samples; i++)
+    {
+        printf("%f,", lowPowerHumidityMeasurements[i]);
+    }
+
+    printf("\n\nHigh Power Humidity Measurements\n");
+    printf("----------------------------------\n");
+    for (int i = 0; i < num_samples; i++)
+    {
+        printf("%f,", highPowerHumidityMeasurements[i]);
+    }
+
 }
