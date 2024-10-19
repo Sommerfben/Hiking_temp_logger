@@ -18,6 +18,10 @@ def compute_stats(values):
         min_error_from_mean = mean_val - min_val
         max_error_from_mean = max_val - mean_val
         
+        # Compute the average error (mean absolute error)
+        abs_errors = [abs(val - mean_val) for val in values]
+        avg_error = np.mean(abs_errors)
+
         # Compute the distribution (histogram)
         hist, bin_edges = np.histogram(values, bins='auto')
         
@@ -27,9 +31,7 @@ def compute_stats(values):
         print(f"Max: {max_val}")
         print(f"Min Error from Mean: {min_error_from_mean}")
         print(f"Max Error from Mean: {max_error_from_mean}")
-        # print(f"Distribution (Histogram):")
-        # for i in range(len(hist)):
-        #     print(f"  Bin {bin_edges[i]:.2f} - {bin_edges[i+1]:.2f}: {hist[i]}")
+        print(f"Average Error from Mean: {avg_error}")
         print('-' * 50)
     
     except ValueError as e:
