@@ -26,7 +26,25 @@ char       dst[count_of(src)];
 
 int main()
 {
-   stdio_init_all();
+   init();
+   shtc3 temp_sensor;
+   uint16_t test_data = 0;
+
+   printf("Hello, world!\n");
+   float temp_data[2];
+   temp_sensor.make_low_power_measurement_blocking(temp_data);
+   printf("Temperature: %f\n", temp_data[0]);
+   printf("Humidity: %f\n", temp_data[1]);
+
+   while (true)
+   {
+    
+   }
+}
+
+bool init()
+{
+    stdio_init_all();
 
    // Initialise the Wi-Fi chip
    if (cyw43_arch_init())
@@ -36,7 +54,7 @@ int main()
    }
 
    // SPI initialisation. This example will use SPI at 1MHz.
-   spi_init(SPI_PORT, 40 * 1000 * 1000);
+   spi_init(SPI_PORT, SPI_BUS_SPEED_HZ);
    gpio_set_function(PIN_MISO, GPIO_FUNC_SPI);
    gpio_set_function(PIN_CS, GPIO_FUNC_SIO);
    gpio_set_function(PIN_SCK, GPIO_FUNC_SPI);
@@ -57,7 +75,7 @@ int main()
    // For more examples of SPI use see https://github.com/raspberrypi/pico-examples/tree/master/spi
 
    // I2C Initialisation. Using it at 400Khz.
-   i2c_init(I2C_PORT, 400 * 1000);
+   i2c_init(I2C_PORT, I2C_BUS_SPEED_HZ);
 
    gpio_set_function(I2C_SDA, GPIO_FUNC_I2C);
    gpio_set_function(I2C_SCL, GPIO_FUNC_I2C);
@@ -119,19 +137,5 @@ int main()
    // Send out a string, with CR/LF conversions
    uart_puts(UART_ID, " Hello, UART!\n");
 
-   // For more examples of UART use see https://github.com/raspberrypi/pico-examples/tree/master/uart
-
-   shtc3 temp_sensor;
-
-   uint16_t test_data = 0;
-
-   printf("Hello, world!\n");
-   float temp_data[2];
-   temp_sensor.make_low_power_measurement_blocking(temp_data);
-   printf("Temperature: %f\n", temp_data[0]);
-   printf("Humidity: %f\n", temp_data[1]);
-
-   while (true)
-   {
-   }
+    return 1;
 }

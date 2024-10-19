@@ -4,7 +4,14 @@
 #include "hardware/i2c.h"
 #include "rp2040_config.h"
 
-
+/**
+ * Reads and converts the results of the most recent measurement command
+ *
+ * @param   data                The float array to populate with results
+ * @param   temperature_first   Must be true if the last command was a TFIRST command, false otherwise
+ *
+ * @return  true if successful
+ */
 uint16_t shtc3::read_data(float *data, bool temperature_first)
 {
    uint8_t regData[6];
@@ -55,6 +62,13 @@ bool shtc3::write_command(uint16_t command)
    return(i2c_write_blocking(I2C_PORT, SHTC3_DEFAULT_ADDR, commandData, 2, false));
 }
 
+/**
+ * Perform a low power measurement of temperature and humidity. 
+ * Populates a data array with [Temperature Reading, Humidity Reading]
+ *
+ * @param   data   The float array to populate with results
+ * @return  true if successful
+ */
 bool shtc3::make_low_power_measurement_blocking(float *data)
 {
    write_command(SHTC3_WAKEUP);
@@ -66,6 +80,13 @@ bool shtc3::make_low_power_measurement_blocking(float *data)
    return(1);
 }
 
+/**
+ * Perform a high power measurement of temperature and humidity. 
+ * Populates a data array with [Temperature Reading, Humidity Reading]
+ *
+ * @param   data   The float array to populate with results
+ * @return  true if successful
+ */
 bool shtc3::make_high_power_measurement_blocking(float *data)
 {
    write_command(SHTC3_WAKEUP);
