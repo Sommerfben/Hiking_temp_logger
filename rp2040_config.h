@@ -1,12 +1,14 @@
 #pragma once
+#include "lib\lvgl-release-v9.2\lvgl.h"
 
 bool init();
+void my_flush_cb(lv_display_t * display, const lv_area_t * area, uint8_t * px_map);
 
 // SPI Defines
 // Use SPI 0, and allocate it to the following GPIO pins
 // Pins can be changed, see the GPIO function select table in the datasheet for information on GPIO assignments
 #define SPI_PORT            spi0
-#define SPI_BUS_SPEED_HZ    40 * 1000 * 1000
+#define SPI_BUS_SPEED_HZ    10 * 1000 * 1000
 #define PIN_MISO            16
 #define PIN_CS              10
 #define PIN_SCK             18

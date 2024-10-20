@@ -12,6 +12,8 @@
 #include "lib\LCD\LCD_Driver.h"
 #include "lib\LCD\GUI_Paint.h"
 #include "rp2040_config.h"
+#include "lib\lvgl-release-v9.2\lvgl.h"
+#include "lib\lvgl-release-v9.2\examples\lv_examples.h"
 
 int64_t alarm_callback(alarm_id_t id, void *user_data)
 {
@@ -23,10 +25,23 @@ int64_t alarm_callback(alarm_id_t id, void *user_data)
 const char src[] = "Hello, world! (from DMA)";
 char       dst[count_of(src)];
 
+/*LVGL draw into this buffer, 1/10 screen size usually works well. The size is in bytes*/
+#define DRAW_BUF_SIZE (LCD_WIDTH * LCD_HEIGHT / 10 * (LV_COLOR_DEPTH / 8))
+uint32_t draw_buf[DRAW_BUF_SIZE / 4];
+
 
 int main()
 {
    init();
+   
+   LCD_Init();
+   lv_init();
+   lv_display_t * display = lv_display_create(LCD_WIDTH, LCD_HEIGHT);
+   
+   /*Set a tick source so that LVGL will know how much time elapsed. */
+   lv_tick_set_cb(time_us_32);
+   lv_display_set_flush_cb(display, my_flush_cb);
+   lv_display_set_buffers(display, draw_buf, NULL, sizeof(draw_buf), LV_DISPLAY_RENDER_MODE_PARTIAL);
    shtc3 temp_sensor;
    uint16_t test_data = 0;
 
@@ -35,11 +50,36 @@ int main()
    temp_sensor.make_low_power_measurement_blocking(temp_data);
    printf("Temperature: %f\n", temp_data[0]);
    printf("Humidity: %f\n", temp_data[1]);
-
+   
+   /**
+    * Basic example to create a "Hello world" label
+    */
+   lv_example_get_started_1();
    while (true)
    {
-    
+      lv_timer_handler(); /* let the GUI do its work */ 
+      sleep_ms(5);
+      //uint16_t color = BLUE;
+      //Paint_Clear(color);
    }
+}
+
+void my_flush_cb(lv_display_t * display, const lv_area_t * area, uint8_t * px_map)
+{
+    /*The most simple case (but also the slowest) to put all pixels to the screen one-by-one
+     *`put_px` is just an example, it needs to be implemented by you.*/
+    uint16_t * buf16 = (uint16_t *)px_map; /*Let's say it's a 16 bit (RGB565) display*/
+    int32_t x, y;
+    for(y = area->y1; y <= area->y2; y++) {
+        for(x = area->x1; x <= area->x2; x++) {
+            LCD_SetUWORD(x, y, *buf16);
+            buf16++;
+        }
+    }
+
+    /* IMPORTANT!!!
+     * Inform LVGL that you are ready with the flushing and buf is not used anymore*/
+    lv_display_flush_ready(display);
 }
 
 bool init()
