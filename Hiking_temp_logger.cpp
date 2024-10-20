@@ -38,14 +38,29 @@ int main()
 
    while (true)
    {
-    Paint_Clear(YELLOW); //g
+    // RRRRR GGGGGG BBBBB: Conventional color mapping
+    // BBBBB RRRRRR GGGGG: Mapping for this display module for some reason
+    Paint_Clear(convert_color(GREEN)); //g
     sleep_ms(1000);
-    Paint_Clear(GRED); // b
-    sleep_ms(1000);
-    Paint_Clear(CYAN); // r
+    //LCD_WriteData_Word(0x21);
     sleep_ms(1000);
    }
 }
+
+// Converts a 16bit RGB565 color into the correct BRG565 color profile for this display
+uint16_t convert_color(uint16_t color) 
+{
+    // Extract Red (bits 11-15), Green (bits 5-10), and Blue (bits 0-4)
+    uint8_t red   = (color >> 11) & 0x1F;  // Extract 5 bits for Red
+    uint8_t green = (color >> 5) & 0x3F;   // Extract 6 bits for Green
+    uint8_t blue  = color & 0x1F;          // Extract 5 bits for Blue
+
+    // Rearrange into the new format: Blue (5 bits), Red (6 bits), Green (5 bits)
+    uint16_t new_color = (blue << 11) | (red << 5) | (green >> 1);
+
+    return new_color;
+}
+
 
 bool init()
 {

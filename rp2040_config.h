@@ -1,6 +1,7 @@
 #pragma once
 
 bool init();
+uint16_t convert_color(uint16_t color);
 
 // SPI Defines
 // Use SPI 0, and allocate it to the following GPIO pins
