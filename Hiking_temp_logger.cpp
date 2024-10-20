@@ -38,7 +38,12 @@ int main()
 
    while (true)
    {
-    
+    Paint_Clear(YELLOW); //g
+    sleep_ms(1000);
+    Paint_Clear(GRED); // b
+    sleep_ms(1000);
+    Paint_Clear(CYAN); // r
+    sleep_ms(1000);
    }
 }
 
