@@ -37,6 +37,7 @@ int main()
    LCD_Init();
    lv_init();
    lv_display_t * display = lv_display_create(LCD_WIDTH, LCD_HEIGHT);
+   lv_display_set_antialiasing(display, true);
    
    /*Set a tick source so that LVGL will know how much time elapsed. */
    lv_tick_set_cb(time_us_32);
@@ -54,15 +55,40 @@ int main()
    /**
     * Basic example to create a "Hello world" label
     */
-   lv_example_get_started_1();
+       /*Change the active screen's background color*/
+   lv_obj_set_style_bg_color(lv_screen_active(), lv_color_hex(0), LV_PART_MAIN);
+
+   /*Create a white label, set its text and align it to the center*/
+   lv_obj_t * label = lv_label_create(lv_screen_active());
+   lv_label_set_text(label, "Hello world");
+   lv_obj_set_style_text_color(lv_screen_active(), lv_color_hex(0xFFFFFF), LV_PART_MAIN);
+   lv_obj_align(label, LV_ALIGN_CENTER, 0, 0);
+   
+   /*Create an Arc*/
+   lv_obj_t * arc = lv_arc_create(lv_screen_active());
+   lv_obj_set_size(arc, 230, 230);
+   lv_obj_set_style_arc_color(arc, lv_palette_main(LV_PALETTE_GREEN), LV_PART_INDICATOR);
+   lv_obj_set_style_arc_color(arc, lv_palette_main(LV_PALETTE_DEEP_PURPLE), LV_PART_MAIN);
+   lv_arc_set_rotation(arc, 180);
+   lv_arc_set_range(arc, 0, 40);
+   lv_arc_set_bg_angles(arc, 0, 360);
+
+   lv_obj_remove_style(arc, NULL, LV_PART_KNOB);   /*Be sure the knob is not displayed*/
+   lv_obj_remove_flag(arc, LV_OBJ_FLAG_CLICKABLE);  /*To not allow adjusting by click*/
+   lv_obj_center(arc);
+
    while (true)
    {
       lv_timer_handler(); /* let the GUI do its work */ 
-      sleep_ms(5);
-      //uint16_t color = BLUE;
-      //Paint_Clear(color);
+      sleep_ms(100);
+      lv_label_set_text_fmt(label, "Temp: %d", (int)temp_data[0]);
+      lv_arc_set_value(arc, ((int)temp_data[0]));
+      temp_sensor.make_low_power_measurement_blocking(temp_data);
+      printf("Temperature: %f\n", temp_data[0]);
+      printf("Humidity: %f\n", temp_data[1]);
    }
 }
+
 
 void my_flush_cb(lv_display_t * display, const lv_area_t * area, uint8_t * px_map)
 {
@@ -76,11 +102,27 @@ void my_flush_cb(lv_display_t * display, const lv_area_t * area, uint8_t * px_ma
             buf16++;
         }
     }
+   // new_color = (color_p->blue << 11) | (color_p->red << 5) | (color_p->green >> 1);
 
     /* IMPORTANT!!!
      * Inform LVGL that you are ready with the flushing and buf is not used anymore*/
     lv_display_flush_ready(display);
 }
+
+// Converts a 16bit RGB565 color into the correct BRG565 color profile for this display
+uint16_t convert_color(uint16_t color) 
+{
+    // Extract Red (bits 11-15), Green (bits 5-10), and Blue (bits 0-4)
+    uint8_t red   = (color >> 11) & 0x1F;  // Extract 5 bits for Red
+    uint8_t green = (color >> 5) & 0x3F;   // Extract 6 bits for Green
+    uint8_t blue  = color & 0x1F;          // Extract 5 bits for Blue
+
+    // Rearrange into the new format: Blue (5 bits), Red (6 bits), Green (5 bits)
+    uint16_t new_color = (blue << 11) | (red << 5) | (green >> 1);
+
+    return new_color;
+}
+
 
 bool init()
 {

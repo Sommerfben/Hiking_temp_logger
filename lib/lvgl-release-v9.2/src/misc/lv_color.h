@@ -102,8 +102,8 @@ typedef struct {
 
 typedef struct {
     uint16_t blue : 5;
-    uint16_t green : 6;
-    uint16_t red : 5;
+    uint16_t green : 5;
+    uint16_t red : 6;
 } lv_color16_t;
 
 typedef struct {

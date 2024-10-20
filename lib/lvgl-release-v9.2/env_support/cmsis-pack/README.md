@@ -191,7 +191,7 @@ with:
 14. Add the following macro definition to **COLOR SETTINGS** section:
 
 ```c
-#define LV_COLOR_16_SWAP 0
+#define LV_COLOR_16_SWAP 
 ```
 
 

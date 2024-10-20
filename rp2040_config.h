@@ -3,6 +3,7 @@
 
 bool init();
 void my_flush_cb(lv_display_t * display, const lv_area_t * area, uint8_t * px_map);
+uint16_t convert_color(uint16_t color);
 
 // SPI Defines
 // Use SPI 0, and allocate it to the following GPIO pins
